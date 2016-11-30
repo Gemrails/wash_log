@@ -166,13 +166,14 @@ def getapi(logpath, uri):
 
 def getapi_local(logpath, uri, gi):
     print uri
-    base_uri = uri.split('/')
+    base_uri = ('').join(uri.split('/'))
     apinum = []
     with gzip.open(logpath, 'r') as fp:
         for line in fp:
             try:
                 linej = json.loads(line)
-                if base_uri in linej['uri'].split('/'):
+                urr = linej['uri'].split('/')
+                if len(urr) == len(base_uri and urr):
                     addr = gi.get_ip_name(linej['remote_addr'])
                     print addr
                     if addr in cont_list_c:
