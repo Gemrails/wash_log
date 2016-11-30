@@ -22,6 +22,7 @@ import country_short as cs
 import time
 from python_ipip.ipip import IP
 from collections import Counter as cr
+import re
 
 class GetIpip():
     def __init__(self):
@@ -184,6 +185,21 @@ def getapi_local(logpath, uri, gi):
                 pass
     return apinum
 
+def getapi_from_re(logpath, uri, gi):
+    apinum = []
+    with gzip.open(logpath, 'r') as fp:
+        for line in fp:
+            try:
+                linej = json.loads(line)
+                urr = linej['uri']
+                if len(re.findall(uri, urr)):
+                    addr = gi.get_ip_name(linej['remote_addr'])
+                    apinum.append(addr)
+            except ValueError, e:
+                #line format ERR
+                pass
+    return apinum
+
 def main(logpath, isjson=0):
     from count_uri import count_upi
     jlist = []
@@ -207,18 +223,17 @@ def main_local(logpath, isjson=0):
     from count_uri import count_upi
     jlist = []
     for uri in count_upi:
-        uritt = getapi_local(logpath, uri, gi)
-        mm = ('_').join(uri.split('/'))
-        outpath = "result_%s" % mm
+        uritt = getapi_from_re(logpath, uri, gi)
         dr = cr(uritt)
-        if not isjson:
-            #mm = json.dumps(dr, encoding="UTF-8", ensure_ascii=False, indent=4)
-            mm = json.dumps(dr, encoding="UTF-8", ensure_ascii=False)
-            rc = wlog_re(outpath, str(mm))
         jlist.append(uri)
         # common name
         jlist.append(dr.most_common())
-    print jlist
     nn = json.dumps(jlist, encoding="UTF-8", ensure_ascii=False, indent=4)
+    if not isjson:
+        mm = os.path.basename(logpath) + "_out.json"
+        outpath = "result_%s" % mm
+        nn = json.dumps(jlist, encoding="UTF-8", ensure_ascii=False)
+        rc = wlog_re(outpath, str(nn))
+        return rc
     print nn
     return nn

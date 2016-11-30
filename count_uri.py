@@ -2,7 +2,22 @@
 #codint=utf-8
 
 count_upi=[
-    "/app/iphone/launch_images",
-    "/data/detail/match/2283023",
-    "/app/tabs/android/1.json?mark=gif"
+    "/article/([^/].+?)html",
+    "app/tabs/android/1.json",
+    "app/tabs/android/3.json",
+    "app/tabs/android/2.json",
+    "app/tabs/android/4.json",
+    "app/tabs/android/5.json",
+    "app/tabs/android/6.json",
+    "app/tabs/android/7.json",
+    "app/tabs/android/8.json",
+    "data/tab/match",
+    "app/tabs/(.+?)/11.json",
+    "/data/team_ranking/8",
+    "/data/team_ranking/7",
+    "/data/team_ranking/9",
+    "/data/team_ranking/13",
+    "/data/team_ranking/10",
+    "/data/team_ranking/18",
+    "/data/team_ranking/16"
 ]
