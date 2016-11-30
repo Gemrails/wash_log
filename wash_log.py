@@ -173,7 +173,7 @@ def getapi_local(logpath, uri, gi):
                 if str(uri) in linej['uri']:
                     addr = gi.get_ip_name(linej['remote_addr'])
                     print addr
-                    if addr in cont_list:
+                    if addr in cont_list_c:
                         apinum.append(addr)
 
             except ValueError, e:
