@@ -194,7 +194,8 @@ def getapi_from_re(logpath, uri, gi):
                 urr = linej['uri']
                 if len(re.findall(uri, urr)):
                     addr = gi.get_ip_name(linej['remote_addr'])
-                    apinum.append(addr)
+                    if addr in cont_list_c:
+                        apinum.append(addr)
             except ValueError, e:
                 #line format ERR
                 pass
