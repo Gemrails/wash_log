@@ -147,6 +147,7 @@ def readlog(logpath, timel):
 
 def getapi(logpath, uri):
     print uri
+    base_uri = uri.split('/')
     apinum = []
     with gzip.open(logpath, 'r') as fp:
         for line in fp:
@@ -154,7 +155,7 @@ def getapi(logpath, uri):
                 linej = json.loads(line)
             except ValueError, e:
                 pass
-            if str(uri) in linej['uri']:
+            if base_uri in linej['uri'].split('/'):
                 addr = lookup_country_free(linej['remote_addr'])
                 if addr in cont_list:
                     #print "find uri: %s, addr: %s" %(str(uri), addr)
