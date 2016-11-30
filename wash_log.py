@@ -170,7 +170,7 @@ def getapi_local(logpath, uri, gi):
             try:
                 linej = json.loads(line)
                 if str(uri) in linej['uri']:
-                    addr = gi.find(linej['remote_addr'])
+                    addr = gi.get_ip_name(linej['remote_addr'])
                     print addr
                     if addr in cont_list:
                         apinum.append(addr)
