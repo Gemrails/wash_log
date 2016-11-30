@@ -25,7 +25,8 @@ from collections import Counter as cr
 
 class GetIpip():
     def __init__(self):
-        self.lsip = IP.load(os.path.abspath("python_ipip/17monipdb.dat"))
+        self.lsip = IP
+        self.lsip.load(os.path.abspath("python_ipip/17monipdb.dat"))
 
     def get_ip_name(self, ip):
         mm = self.lsip.find(ip).split('\t')[0]
