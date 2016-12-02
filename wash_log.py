@@ -11,6 +11,7 @@ cont_list_c = ['德国', '英国', '爱尔兰', '印度', '意大利', '马来�
 
 import sys
 
+a = sys.stdout
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -233,7 +234,7 @@ def main_local(logpath, isjson=0):
     if not isjson:
         mm = os.path.basename(logpath) + "_out.json"
         outpath = "result_%s" % mm
-        nn = json.dumps(jlist, encoding="UTF-8", ensure_ascii=False)
+        nn = json.dumps(jlist, encoding="UTF-8", ensure_ascii=False, indent=4)
         rc = wlog_re(outpath, str(nn))
         return rc
     print nn
