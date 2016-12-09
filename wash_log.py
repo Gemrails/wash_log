@@ -202,6 +202,8 @@ def getapi_from_re(logpath, uri, gi):
                 pass
     return apinum
 
+
+
 def main(logpath, isjson=0):
     from count_uri import count_upi
     jlist = []
