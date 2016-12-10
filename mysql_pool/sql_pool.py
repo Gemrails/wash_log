@@ -12,33 +12,10 @@ desc:数据库操作类
 import MySQLdb
 from MySQLdb.cursors import DictCursor
 from DBUtils.PooledDB import PooledDB
-import ConfigParser
-import os
 
-
-class _ConfigGet(object):
-    '''
-    获取配置
-    '''
-
-    def __int__(self, config_name):
-        self.cp = ConfigParser.ConfigParser()
-        self.path = os.path.split(os.path.realpath(__file__))[0] + config_name
-        if os.path.exists(self.path):
-            pass
-        else:
-            raise
-
-        self.cp.read(self.path)
-
-
-    def _get_conf(self, sect, key):
-        try:
-            rc = self.cp.get(sect, key)
-            return rc
-        except Exception, e:
-            print "_get_config ERR: " + str(e)
-            return 0
+import sys
+sys.path.append("../")
+from _Config import _config
 
 
 class MysqlPool(object):
@@ -49,15 +26,15 @@ class MysqlPool(object):
     """
     #连接池对象
     __pool = None
-    def __init__(self, num_cache=10):
+    def __init__(self):
         """
         数据库构造函数，从连接池中取出连接，并生成操作游标
         """
 #        self._conn = MySQLdb.connect(host=Config.DBHOST , port=Config.DBPORT , user=Config.DBUSER , passwd=Config.DBPWD ,
 #                              db=Config.DBNAME,use_unicode=False,charset=Config.DBCHAR,cursorclass=DictCursor)
-        self._conn = Mysql.__getConn()
+
+        self._conn = MysqlPool.__getConn()
         self._cursor = self._conn.cursor()
-        self.maxcached = num_cache
 
     @staticmethod
     def __getConn():
@@ -65,11 +42,19 @@ class MysqlPool(object):
         @summary: 静态方法，从连接池中取出连接
         @return MySQLdb.connection
         """
-        if Mysql.__pool is None:
-            cg = ConfigGet()
-            __pool = PooledDB(creator=MySQLdb, mincached=1 , maxcached=20 ,
-                              host=Config.DBHOST , port=Config.DBPORT , user=Config.DBUSER , passwd=Config.DBPWD ,
-                              db=Config.DBNAME,use_unicode=False,charset=Config.DBCHAR,cursorclass=DictCursor)
+        cf = _config._ConfigGet()
+        try:
+            cf.read('sql_config.ini')
+        except CacheNopath, e:
+            print "MysqlPool ERR: " + str(e)
+            exit(1)
+
+        sect = 'inter-mysql'
+        if MysqlPool.__pool is None:
+            __pool = PooledDB(creator=MySQLdb, mincached=1, maxcached=int(cf.get(sect, 'numcached ')),  \
+                              host=cf.get(sect, 'DBHOST'), port=cf.get(sect, 'DBPORT'), user=cf.get(sect, 'DBUSER'),  \
+                              passwd=cf.get(sect, 'DBPASSWD'), db=cf.get(sect, 'DBNAME'), use_unicode=False,  \
+                              charset=cf.get(sect, 'DBCHAR'), cursorclass=DictCursor)
         return __pool.connection()
 
     def getAll(self,sql,param=None):
@@ -204,5 +189,4 @@ class MysqlPool(object):
         self._conn.close()
 
 if __name__ == '__main__':
-    cg = _ConfigGet()
-    print cg._get_conf('inter-mysql', 'DBHOST')
+    mp = MysqlPool()
