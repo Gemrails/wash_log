@@ -51,8 +51,8 @@ class MysqlPool(object):
 
         sect = 'inter-mysql'
         if MysqlPool.__pool is None:
-            __pool = PooledDB(creator=MySQLdb, mincached=1, maxcached=int(cf.get(sect, 'numcached ')),  \
-                              host=cf.get(sect, 'DBHOST'), port=cf.get(sect, 'DBPORT'), user=cf.get(sect, 'DBUSER'),  \
+            __pool = PooledDB(creator=MySQLdb, mincached=1, maxcached=int(cf.get(sect, 'numcached')),  \
+                              host=cf.get(sect, 'DBHOST'), port=int(cf.get(sect, 'DBPORT')), user=cf.get(sect, 'DBUSER'),  \
                               passwd=cf.get(sect, 'DBPASSWD'), db=cf.get(sect, 'DBNAME'), use_unicode=False,  \
                               charset=cf.get(sect, 'DBCHAR'), cursorclass=DictCursor)
         return __pool.connection()
@@ -190,3 +190,11 @@ class MysqlPool(object):
 
 if __name__ == '__main__':
     mp = MysqlPool()
+    sql = "select uuid, created_at from uuids where created_at > '2016-11-19 00:00:00'"
+    param = ('uuid', 'creatd_at')
+
+    print mp.getOne(sql)
+    print mp.getAll(sql)
+
+    mp.dispose(isEnd=1)
+

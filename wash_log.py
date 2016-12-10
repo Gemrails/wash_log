@@ -1,8 +1,6 @@
 #!/usr/bin/python
 #coding=utf-8
 
-NORPATH='/tmp/api.allfootballapp.com.access.2016-11-07-10.8.18.235.log.gz'
-
 PATH_NGINX='/data/logs/nginx'
 PATH_TEST='/tmp/log'
 PATH_PHP='/data/logs/nginx'
@@ -20,10 +18,11 @@ import json
 import os
 import urllib2
 import country_short as cs
-import time
+import time, datetime
 from python_ipip.ipip import IP
 from collections import Counter as cr
 import re
+
 
 class GetIpip():
     def __init__(self):
@@ -202,8 +201,6 @@ def getapi_from_re(logpath, uri, gi):
                 pass
     return apinum
 
-
-
 def main(logpath, isjson=0):
     from count_uri import count_upi
     jlist = []
@@ -241,3 +238,47 @@ def main_local(logpath, isjson=0):
         return rc
     print nn
     return nn
+
+
+class TimeFormatCook(object):
+
+    __format_inter = "%Y-%m-%d %H:%M:%S"
+    __today = datetime.date.today()
+
+    def __init__(self, time_string="1970-1-1 00:00:00"):
+        '''
+        2016-11-19 00:00:00
+        '''
+        self.format_inter = "%Y-%m-%d %H:%M:%S"
+        self.today = datetime.date.today()
+
+    def __today_format(self, timesetting=1):
+        if timesetting == 1:
+            print time.strftime(self.format_inter)
+
+    @staticmethod
+    def today_zero():
+        '''
+        string...
+        '''
+        return datetime.datetime.strftime(TimeFormatCook.__today, TimeFormatCook.__format_inter)
+
+    @staticmethod
+    def time_change(day=0):
+        '''
+        string -> datetime
+        + - 相应天数获得对应时间.
+        '''
+        today_zero = datetime.datetime.strptime(TimeFormatCook.today_zero(), TimeFormatCook.__format_inter)
+        if isinstance(day,(int,str)):
+            day = int(day)
+        day_change = today_zero + datetime.timedelta(days= day)
+        return day_change
+
+
+if __name__ == '__main__':
+    print TimeFormatCook.today_zero()
+    print TimeFormatCook.time_change()
+
+
+
