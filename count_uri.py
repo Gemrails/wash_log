@@ -21,3 +21,12 @@ count_upi=[
     "/data/team_ranking/18",
     "/data/team_ranking/16"
 ]
+
+
+count2_uri=[
+    "/device/registration",
+    "/article/(^.[0-9]).html",
+    "/data/tab/important",
+    "/app/tabs/{iphone|android}/11.json",
+    "/data/team_ranking"
+]

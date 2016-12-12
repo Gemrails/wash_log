@@ -185,6 +185,13 @@ def getapi_local(logpath, uri, gi):
                 pass
     return apinum
 
+def ip_check(ip, gi):
+    addr = gi.get_ip_name(ip)
+    if addr in cont_list_c:
+        return addr
+    else:
+        return 0
+
 def getapi_from_re(logpath, uri, gi):
     apinum = []
     with gzip.open(logpath, 'r') as fp:
@@ -200,6 +207,29 @@ def getapi_from_re(logpath, uri, gi):
                 #line format ERR
                 pass
     return apinum
+
+def getapi_from_re2(logpath, gi, uuid_list=None):
+    from count_uri import count2_uri
+    out_api = []
+    with gzip.open(logpath, 'r') as fp:
+        for line in fp:
+            linej = json.loads(line)
+            uuid = linej['uuid']
+            if uuid in uuid_list:
+                urr = linej['uri']
+                for uri in count2_uri:
+                    if len(re.findall(uri, urr)):
+                        addr = gi.get_ip_name(linej['remote_addr'])
+                        real_key = uuid + ':' + addr + str(uri)
+                        out_api.append(real_key)
+                        break
+                    else:
+                        continue
+            else:
+                continue
+    print out_api
+    return out_api
+
 
 def main(logpath, isjson=0):
     from count_uri import count_upi
@@ -270,15 +300,54 @@ class TimeFormatCook(object):
         + - 相应天数获得对应时间.
         '''
         today_zero = datetime.datetime.strptime(TimeFormatCook.today_zero(), TimeFormatCook.__format_inter)
-        if isinstance(day,(int,str)):
+        if isinstance(day,(int)):
             day = int(day)
         day_change = today_zero + datetime.timedelta(days= day)
         return day_change
 
 
+def get_valid_uuid(logpath, days=-1):
+    from mysql_pool import sql_pool
+    sp = sql_pool.MysqlPool()
+    sql1 = "select uuid, created_ip, last_ip from uuids where created_at > '%s'" % TimeFormatCook.time_change(days)
+    out = sp.getAll(sql1)
+    '''
+    out = ({'last_ip': '183.232.175.4', 'uuid': '908e804ebf4f3e2', 'created_ip': '183.232.175.4'},  \
+           {'last_ip': '23.106.150.102', 'uuid': '2727557', 'created_ip': '23.106.150.102'},  \
+           {'last_ip': '124.207.6.82', 'uuid': '354834060490145', 'created_ip': '124.207.6.82'},  \
+           {'last_ip': '23.106.150.102', 'uuid': '2727565', 'created_ip': '23.106.150.102'},  \
+           {'last_ip': '123.123.51.81', 'uuid': '8861c4c529a170a8f09d44fe1830c635e7f5b483', 'created_ip': '123.123.51.81'},  \
+           {'last_ip': '23.91.100.107', 'uuid': '2727558', 'created_ip': '23.91.100.107'},  \
+           {'last_ip': '124.207.6.82', 'uuid': 'c0531bd1b807a2ea0e5588980f38b922de6d5791', 'created_ip': '124.207.6.82'},  \
+           {'last_ip': '23.91.100.107', 'uuid': '2727603', 'created_ip': '23.91.100.107'},  \
+           {'last_ip': '124.207.6.82', 'uuid': '860582031986330', 'created_ip': '23.91.100.107'},  \
+           {'last_ip': '183.232.175.3', 'uuid': '98f7bc077671eb0', 'created_ip': '183.232.175.3'},  \
+           {'last_ip': '124.207.6.82', 'uuid': '29569e74f4b96209dedd32a589ca68e6d99acbb2', 'created_ip': '124.207.6.82'},  \
+           {'last_ip': '218.205.184.14', 'uuid': 'bacdb540ca012a9c5ef2c5aed26e332e76d47789', 'created_ip': '124.207.6.82'},  \
+           {'last_ip': '124.207.6.82', 'uuid': '2727539', 'created_ip': '124.207.6.82'},  \
+           {'last_ip': '124.207.6.82', 'uuid': '2727612', 'created_ip': '124.207.6.82'},  \
+           {'last_ip': '124.207.6.82', 'uuid': '2727567', 'created_ip': '124.207.6.82'})
+    '''
+    listout = list(out)
+    gi = GetIpip()
+
+    for mm in range(0, len(listout)):
+        addr_real = ip_check(listout[mm].get('last_ip'), gi) or ip_check(out[mm].get('created_ip'), gi)
+        if addr_real:
+            #listout[mm]['uuid'] = listout[mm].get('uuid') + ':' + addr_real
+            pass
+        else:
+            listout[mm] = {}
+
+    list_uuids = [listout[i].get('uuid') for i in xrange(len(listout)) if listout[i].get('uuid') ]
+
+    nn = json.dumps(getapi_from_re2(logpath, gi, list_uuids), encoding="UTF-8", ensure_ascii=False, indent=4)
+    return nn
+
+
 if __name__ == '__main__':
     print TimeFormatCook.today_zero()
-    print TimeFormatCook.time_change()
+    print type(TimeFormatCook.time_change())
 
 
 

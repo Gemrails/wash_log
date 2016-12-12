@@ -190,11 +190,13 @@ class MysqlPool(object):
 
 if __name__ == '__main__':
     mp = MysqlPool()
-    sql = "select uuid, created_at from uuids where created_at > '2016-11-19 00:00:00'"
+    sql = "select uuid, created_at, last_ip from uuids where created_at > '2016-11-19 00:00:00'"
     param = ('uuid', 'creatd_at')
 
+
     print mp.getOne(sql)
-    print mp.getAll(sql)
+    out =  mp.getAll(sql)
+    print type(out)
 
     mp.dispose(isEnd=1)
 
