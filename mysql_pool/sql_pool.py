@@ -184,7 +184,7 @@ class MysqlPool(object):
         if isEnd==1:
             self.end('commit')
         else:
-            self.end('rollback');
+            self.end('rollback')
         self._cursor.close()
         self._conn.close()
 
