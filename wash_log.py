@@ -190,17 +190,17 @@ def log_line(line, table_name, gi):
     #依据母表生成当日子表
     try:
         lineno = json.loads(line)
+        uri_re = lineno['uri']
+        uuid = lineno['uuid']
+        remote_ip = lineno['remote_addr']
+        country = gi.get_ip_name(lineno['remote_addr'])
+        visit_time = lineno['@timestamp']
+        sql1 = "insert into %s (uri_re, uuid, country, remote_ip, visit_time) values ('%s', '%s', '%s', '%s', '%s');" %(table_name, uri_re, uuid, country, remote_ip, visit_time)
+        return sql1
+    
     except Exception, e:
         pass
-        print str(e)
-
-    uri_re = lineno['uri']
-    uuid = lineno['uuid']
-    remote_ip = lineno['remote_addr']
-    country = gi.get_ip_name(lineno['remote_addr'])
-    visit_time = lineno['@timestamp']
-    sql1 = "insert into %s (uri_re, uuid, country, remote_ip, visit_time) values ('%s', '%s', '%s', '%s', '%s');" %(table_name, uri_re, uuid, country, remote_ip, visit_time)
-    return sql1
+        #print str(e)
 
 def _test_read_local_log(line, gi):
 
