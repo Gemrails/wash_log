@@ -323,6 +323,10 @@ def main_local(logpath, isjson=0):
     print nn
     return nn
 
+def main_line_in(logpath):
+    gi = GetIpip()
+    read_local_log(logpath, gi)
+
 
 class TimeFormatCook(object):
 
