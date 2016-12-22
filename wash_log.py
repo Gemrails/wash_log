@@ -146,6 +146,8 @@ def readlog(logpath, timel):
     fp.close()
     
 
+
+
 def getapi(logpath, uri):
     print uri
     base_uri = uri.split('/')
@@ -164,6 +166,58 @@ def getapi(logpath, uri):
     # return ['CN', 'CN', 'MM']
     apinum = [ cs.getcountry(x) for x in apinum ]
     return apinum
+
+def read_local_log(logpath, gi):
+
+    table_format1 = "line_info_%s"
+    (filepath,filename)=os.path.split(logpath)
+    mm = filename.split('.')
+    if mm[0] == 'api':
+        nn_time = ('_').join(mm[4].split('-')[:-1])
+        table_name = table_format1 % nn_time
+    else:
+        table_name = table_format1 % '0000_00_00'
+        print "Only api log can be analyst."
+        pass
+
+    with gzip.open(logpath, 'r') as fp:
+        for line in fp:
+            log_line(line, table_name, gi)
+
+
+
+def log_line(line, table_name, gi):
+    #依据母表生成当日子表
+    try:
+        lineno = json.loads(line)
+    except Exception, e:
+        pass
+        print str(e)
+
+    uri_re = lineno['uri']
+    uuid = lineno['uuid']
+    remote_ip = lineno['remote_addr']
+    country = gi.get_ip_name(lineno['remote_addr'])
+    visit_time = lineno['@timestamp']
+    sql1 = "insert into %s (uri_re, uuid, country, remote_ip, visit_time) values ('%s', '%s', '%s', '%s', '%s');" %(table_name, uri_re, uuid, country, remote_ip, visit_time)
+    return sql1
+
+def _test_read_local_log(line, gi):
+
+    lineno = json.loads(line)
+
+    format1 = '%s^_^%s^_^%s^_^%s^_^%s'
+
+    uri_re = lineno['uri']
+    uuid = lineno['uuid']
+    remote_ip = lineno['remote_addr']
+    country = gi.get_ip_name(lineno['remote_addr'])
+    visit_time = lineno['@timestamp']
+    #agent = lineno['agent']
+    #mm = format1.format(uri_re, uuid, remote_ip, country, visit_time, agent)
+    mm = '%s^_^%s^_^%s^_^%s^_^%s' %(uri_re, uuid, remote_ip, country, visit_time)
+    print mm
+
 
 def getapi_local(logpath, uri, gi):
     print uri
@@ -346,8 +400,11 @@ def get_valid_uuid(logpath, days=-1):
 
 
 if __name__ == '__main__':
-    print TimeFormatCook.today_zero()
-    print type(TimeFormatCook.time_change())
+    #print TimeFormatCook.today_zero()
+    #print type(TimeFormatCook.time_change())
+    gi = GetIpip()
+    line = '{"@timestamp":"2016-12-19T16:32:21+08:00","server_addr":"10.8.97.205","remote_addr":"124.207.6.82","scheme":"http","host":"beta-api.allfootballapp.com","method":"GET","uri":"/upgrade?platform=android&is_sem=0","url":"/index.php","protocol":"HTTP/1.1","status":200,"size":248,"request_time":0.089,"upstream_time":"0.078","upstream_host":"127.0.0.1:9000","referer":"-","agent":"Mozilla/5.0 (Linux; Android 6.0; PLK-AL10 Build/HONORPLK-AL10; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/49.0.2623.105 Mobile Safari/537.36 News/7 Android/7 AppFootball/7 SDK/23","xff":"124.207.6.82","uuid": "860582031986330","authorization":"","lang":"zh-cn"}'
+    print log_line(line, 'line_info_2016_12_21', gi)
 
 
 
